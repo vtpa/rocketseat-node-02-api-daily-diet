@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('name').notNullable()
     table.text('description')
     table.boolean('is_on_diet')
-    table.timestamp('date').notNullable()
+    table.datetime('date').notNullable()
     table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
   })
 }
