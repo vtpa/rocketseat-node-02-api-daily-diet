@@ -30,6 +30,7 @@ export async function usersRoutes(app: FastifyInstance) {
         path: '/',
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       })
-      .send(newUser)
+      .status(201)
+      .send(newUser[0])
   })
 }

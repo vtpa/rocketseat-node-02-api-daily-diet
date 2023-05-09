@@ -44,7 +44,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       const mealsCount = await knex('meals')
         .where('user_id', userId)
         .count('id', { as: 'totalMeals' })
-      return mealsCount
+      return mealsCount[0]
     },
   )
   app.get(
@@ -62,7 +62,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         .where('user_id', userId)
         .andWhere('is_on_diet', isOnDiet === 'onDiet')
         .count('id', { as: 'totalMeals' })
-      return mealsCount
+      return mealsCount[0]
     },
   )
   app.get(
@@ -81,6 +81,9 @@ export async function mealsRoutes(app: FastifyInstance) {
             (acc, row) => {
               if (row.is_on_diet) {
                 acc.currentInterval += 1
+                if (acc.currentInterval > acc.maxInterval) {
+                  acc.maxInterval = acc.currentInterval
+                }
               } else {
                 if (acc.currentInterval > acc.maxInterval) {
                   acc.maxInterval = acc.currentInterval
@@ -102,7 +105,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     {
       preHandler: [checkUserIdCookie],
     },
-    async (request) => {
+    async (request, reply) => {
       const { userId } = request.cookies
       const createMealBodySchema = z.object({
         name: z.string(),
@@ -124,7 +127,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         })
         .returning('*')
 
-      return newMeal
+      reply.status(201).send(newMeal[0])
     },
   )
   app.put(
@@ -172,7 +175,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         })
         .returning('*')
 
-      return updatedMeal
+      return updatedMeal[0]
     },
   )
   app.delete(
